@@ -57,7 +57,7 @@ Struktura została dostosowana do najnowszego App Routera w Next.js 13+, zgodnie
     NEXTAUTH_SECRET=your-secret-key
     NEXTAUTH_URL=host
     ```
-5. **Uruchom aplikację: **
+5. **Uruchom aplikację:**
    ```bash
     npm run dev
    ```
