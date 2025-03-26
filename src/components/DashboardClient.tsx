@@ -1,18 +1,18 @@
 "use client";
 
-import {useEffect, useState} from "react";
-import {Category, Transaction} from "@/types";
+import { useEffect, useState } from "react";
+import { Category, Transaction } from "@/types";
 import AddTransactionForm from "./AddTransactionForm";
-import EditTransactionModal from "@/components/EditTransactionModal";
+import EditTransactionModal from "./EditTransactionModal";
 
-interface Props {
+interface DashboardClientProps {
     initialTransactions: Transaction[];
 }
 
-export default function DashboardClient({ initialTransactions }: Props) {
-    const [transactions, setTransactions] = useState(initialTransactions);
+export default function DashboardClient({ initialTransactions }: DashboardClientProps) {
+    const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [editModal, setEditModal] = useState<Transaction | null>(null)
+    const [editModal, setEditModal] = useState<Transaction | null>(null);
 
     useEffect(() => {
         fetch("/api/categories")
@@ -21,22 +21,19 @@ export default function DashboardClient({ initialTransactions }: Props) {
     }, []);
 
     const handleDelete = async (id: string) => {
-        const confirmed = confirm("Na pewno usunąć?");
-        if (!confirmed) return;
+        if (!confirm("Na pewno usunąć?")) return;
 
         await fetch(`/api/transactions/${id}`, { method: "DELETE" });
-
-        // Odśwież dane lokalnie
         setTransactions(prev => prev.filter(t => t.id !== id));
     };
 
     const incomeTotal = transactions
         .filter(t => t.category.type === "income")
-        .reduce((acc, t) => acc + t.amount, 0);
+        .reduce((sum, t) => sum + t.amount, 0);
 
     const expenseTotal = transactions
         .filter(t => t.category.type === "expense")
-        .reduce((acc, t) => acc + t.amount, 0);
+        .reduce((sum, t) => sum + t.amount, 0);
 
     return (
         <>
@@ -51,7 +48,7 @@ export default function DashboardClient({ initialTransactions }: Props) {
                 </div>
             </div>
 
-            {categories.length > 0 && <AddTransactionForm initCategories={categories}/>}
+            {categories.length > 0 && <AddTransactionForm initCategories={categories} />}
 
             <h2 className="mt-8 mb-2 text-lg font-semibold">Historia transakcji</h2>
             <ul className="space-y-2">
@@ -88,15 +85,14 @@ export default function DashboardClient({ initialTransactions }: Props) {
                     </li>
                 ))}
             </ul>
+
             {editModal && (
                 <EditTransactionModal
                     transaction={editModal}
                     categories={categories}
                     onClose={() => setEditModal(null)}
-                    onUpdate={(updated) => {
-                        setTransactions(prev =>
-                            prev.map(t => (t.id === updated.id ? updated : t))
-                        );
+                    onUpdate={updated => {
+                        setTransactions(prev => prev.map(t => (t.id === updated.id ? updated : t)));
                     }}
                 />
             )}

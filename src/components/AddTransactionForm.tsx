@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Category, TransactionInput, TransactionType } from "@/types";
+import { useState } from "react";
+import { Category, TransactionType } from "@/types";
+
+interface AddTransactionFormProps {
+    initCategories: Category[];
+}
 
 const defaultForm = {
     amount: 0,
@@ -10,16 +14,15 @@ const defaultForm = {
     type: "expense" as TransactionType,
 };
 
-
-export default function AddTransactionForm({initCategories}: Category[]) {
+export default function AddTransactionForm({ initCategories }: AddTransactionFormProps) {
     const [form, setForm] = useState(defaultForm);
-    const [categories, setCategories] = useState<Category[]>(initCategories);
+    const [categories] = useState<Category[]>(initCategories);
+
 
     const filteredCategories = categories.filter(c => c.type === form.type);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-
         setForm(prev => ({
             ...prev,
             [name]: name === "amount" ? parseFloat(value) : value
@@ -28,14 +31,16 @@ export default function AddTransactionForm({initCategories}: Category[]) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         const { amount, categoryId, note } = form;
+
         await fetch("/api/transactions", {
             method: "POST",
-            body: JSON.stringify({ amount, categoryId, note }),
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount, categoryId, note }),
         });
 
-        window.location.reload();
+        window.location.reload(); // prosto, ale skutecznie
     };
 
     return (
@@ -64,7 +69,7 @@ export default function AddTransactionForm({initCategories}: Category[]) {
                             setForm(prev => ({
                                 ...prev,
                                 type: value,
-                                categoryId: "" // reset kategorii przy zmianie typu
+                                categoryId: ""
                             }));
                         }}
                         className="w-full border px-2 py-1 rounded"

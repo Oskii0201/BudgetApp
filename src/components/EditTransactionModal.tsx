@@ -1,31 +1,40 @@
 "use client";
 
-import { Category, Transaction } from "@/types";
 import { useState } from "react";
+import { Category, Transaction } from "@/types";
 
-interface Props {
+interface EditTransactionModalProps {
     transaction: Transaction;
     categories: Category[];
     onClose: () => void;
     onUpdate: (updated: Transaction) => void;
 }
 
-export default function EditTransactionModal({ transaction, categories, onClose, onUpdate }: Props) {
+export default function EditTransactionModal({
+                                                 transaction,
+                                                 categories,
+                                                 onClose,
+                                                 onUpdate,
+                                             }: EditTransactionModalProps) {
     const [form, setForm] = useState({
         amount: transaction.amount,
         note: transaction.note || "",
-        categoryId: transaction.category.id
+        categoryId: transaction.category.id,
     });
 
     const filteredCategories = categories.filter(c => c.type === transaction.category.type);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: name === "amount" ? parseFloat(value) : value }));
+        setForm(prev => ({
+            ...prev,
+            [name]: name === "amount" ? parseFloat(value) : value,
+        }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         const res = await fetch(`/api/transactions/${transaction.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
