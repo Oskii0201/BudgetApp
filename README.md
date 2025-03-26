@@ -46,7 +46,10 @@ Struktura została dostosowana do najnowszego App Routera w Next.js 13+, zgodnie
    ```
 3. **Wygeneruj i zastosuj migracje oraz uruchom seeder:**
    ```bash
-    npx prisma migrate dev --name init && npm run seed
+    npx prisma migrate dev --name init
+   ```
+   ```bash
+    npm run seed
    ```
 4. **Dodaj plik .env.local:**
 - Stwórz plik .env w katalogu głównym i dodaj następujące zmienne.
