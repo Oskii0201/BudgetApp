@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcrypt-ts";
 import { prisma } from "./db";
 import { AuthOptions } from "next-auth";
+import {compareSync} from "bcryptjs";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -17,7 +17,7 @@ export const authOptions: AuthOptions = {
                 const user = await prisma.user.findUnique({ where: { email: credentials.email } });
                 if (!user) return null;
 
-                const isValid = await compare(credentials.password, user.password);
+                const isValid = compareSync(credentials.password, user.password);
                 if (!isValid) return null;
 
                 return { id: user.id, email: user.email };
@@ -30,13 +30,13 @@ export const authOptions: AuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.id = user.id; // Dodaj ID do tokena
+                token.id = user.id;
             }
             return token;
         },
         async session({ session, token }) {
             if (token?.id) {
-                session.user.id = token.id as string; // Dodaj ID do sesji
+                session.user.id = token.id as string;
             }
             return session;
         }

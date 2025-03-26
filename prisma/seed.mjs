@@ -8,19 +8,16 @@ async function main() {
     const plainPassword = "example";
     const password = hashSync(plainPassword, 10);
 
-    // Sprawdź czy użytkownik już istnieje
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
         console.log("Użytkownik już istnieje – pomijam seeda.");
         return;
     }
 
-    // Tworzymy użytkownika
     const user = await prisma.user.create({
         data: { email, password }
     });
 
-    // Kategorie domyślne
     const defaultCategories = [
         { name: "Wynagrodzenie", type: "income" },
         { name: "Freelance", type: "income" },
@@ -31,18 +28,15 @@ async function main() {
         { name: "Zakupy", type: "expense" }
     ];
 
-    // Tworzymy kategorie
     await prisma.category.createMany({
         data: defaultCategories
     });
 
-    // Pobieramy kategorie jako mapę: name -> id
     const allCategories = await prisma.category.findMany();
     const categoriesMap = Object.fromEntries(
         allCategories.map(c => [c.name, c.id])
     );
 
-    // Tworzymy przykładowe transakcje
     await prisma.transaction.createMany({
         data: [
             {

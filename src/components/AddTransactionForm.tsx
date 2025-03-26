@@ -40,7 +40,7 @@ export default function AddTransactionForm({ initCategories }: AddTransactionFor
             body: JSON.stringify({ amount, categoryId, note }),
         });
 
-        window.location.reload(); // prosto, ale skutecznie
+        window.location.reload();
     };
 
     return (
